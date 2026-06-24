@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictor de precio de automóviles (MSRP)</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #1f2937, #111827);
+            color: #1f2937;
+            margin: 0;
+            padding: 30px 15px;
+        }
+        .tarjeta {
+            max-width: 640px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+            overflow: hidden;
+        }
+        .encabezado {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            padding: 26px 30px;
+        }
+        .encabezado h1 { margin: 0 0 6px 0; font-size: 22px; }
+        .encabezado p { margin: 0; opacity: 0.9; font-size: 14px; }
+        form { padding: 26px 30px 10px 30px; }
+        .campo { margin-bottom: 18px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+        input, select {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 9px;
+            font-size: 15px;
+            background: #f9fafb;
+        }
+        input:focus, select:focus { outline: 2px solid #2563eb; background: #ffffff; }
+        .fila { display: flex; gap: 16px; }
+        .fila .campo { flex: 1; }
+        .boton {
+            width: 100%;
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 8px 0 24px 0;
+        }
+        .boton:hover { background: #1d4ed8; }
+        .resultado {
+            margin: 0 30px 28px 30px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #ecfdf5;
+            border: 1px solid #6ee7b7;
+            text-align: center;
+        }
+        .resultado .etiqueta { font-size: 14px; color: #065f46; margin-bottom: 4px; }
+        .resultado .precio { font-size: 30px; font-weight: 800; color: #047857; }
+        .errorCaja {
+            margin: 0 30px 28px 30px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            font-size: 14px;
+        }
+        .pie { text-align: center; font-size: 12px; color: #6b7280; padding: 0 30px 22px 30px; }
+    </style>
+</head>
+<body>
+    <div class="tarjeta">
+        <div class="encabezado">
+            <h1>Predictor de precio sugerido (MSRP)</h1>
+            <p>Estima el precio de un automóvil en dólares a partir de sus características.</p>
+        </div>
+
+        <form method="POST" action="/">
+            <div class="fila">
+                <div class="campo">
+                    <label for="engine_hp">Potencia del motor (HP)</label>
+                    <input type="number" step="any" id="engine_hp" name="engine_hp"
+                           min="{{ rangos['Engine HP'][0] }}" max="{{ rangos['Engine HP'][1] }}"
+                           placeholder="Ej. {{ rangos['Engine HP'][2] }}"
+                           value="{{ valores.get('engine_hp', '') }}" required>
+                </div>
+                <div class="campo">
+                    <label for="year">Año del modelo</label>
+                    <input type="number" id="year" name="year"
+                           min="{{ rangos['Year'][0] }}" max="{{ rangos['Year'][1] }}"
+                           placeholder="Ej. {{ rangos['Year'][2] }}"
+                           value="{{ valores.get('year', '') }}" required>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="make">Marca</label>
+                <select id="make" name="make" required>
+                    <option value="" disabled {% if not valores.get('make') %}selected{% endif %}>Selecciona una marca</option>
+                    {% for marca in marcas %}
+                    <option value="{{ marca }}" {% if valores.get('make') == marca %}selected{% endif %}>{{ marca }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="campo">
+                <label for="fuel_type">Tipo de combustible</label>
+                <select id="fuel_type" name="fuel_type" required>
+                    <option value="" disabled {% if not valores.get('fuel_type') %}selected{% endif %}>Selecciona el combustible</option>
+                    {% for combustible in combustibles %}
+                    <option value="{{ combustible }}" {% if valores.get('fuel_type') == combustible %}selected{% endif %}>{{ combustible }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="fila">
+                <div class="campo">
+                    <label for="vehicle_size">Tamaño del vehículo</label>
+                    <select id="vehicle_size" name="vehicle_size" required>
+                        <option value="" disabled {% if not valores.get('vehicle_size') %}selected{% endif %}>Selecciona el tamaño</option>
+                        {% for tamano in tamanos %}
+                        <option value="{{ tamano }}" {% if valores.get('vehicle_size') == tamano %}selected{% endif %}>{{ tamano }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="popularity">Popularidad de la marca</label>
+                    <input type="number" step="any" id="popularity" name="popularity"
+                           min="{{ rangos['Popularity'][0] }}" max="{{ rangos['Popularity'][1] }}"
+                           placeholder="Ej. {{ rangos['Popularity'][2] }}"
+                           value="{{ valores.get('popularity', '') }}" required>
+                </div>
+            </div>
+
+            <button type="submit" class="boton">Estimar precio</button>
+        </form>
+
+        {% if prediccion %}
+        <div class="resultado">
+            <div class="etiqueta">Precio sugerido estimado</div>
+            <div class="precio">$ {{ prediccion }} USD</div>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="errorCaja">{{ error }}</div>
+        {% endif %}
+
+        <div class="pie">
+            Modelo: Random Forest sobre 6 características seleccionadas · Dataset: Car Features and MSRP (CooperUnion)
+        </div>
+    </div>
+</body>
+</html>
