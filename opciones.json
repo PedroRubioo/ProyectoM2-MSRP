@@ -1,0 +1,81 @@
+{
+  "opciones": {
+    "Make": [
+      "Acura",
+      "Alfa Romeo",
+      "Aston Martin",
+      "Audi",
+      "BMW",
+      "Buick",
+      "Cadillac",
+      "Chevrolet",
+      "Chrysler",
+      "Dodge",
+      "FIAT",
+      "Ferrari",
+      "Ford",
+      "GMC",
+      "Genesis",
+      "HUMMER",
+      "Honda",
+      "Hyundai",
+      "Infiniti",
+      "Kia",
+      "Land Rover",
+      "Lexus",
+      "Lincoln",
+      "Lotus",
+      "Maserati",
+      "Mazda",
+      "Mercedes-Benz",
+      "Mitsubishi",
+      "Nissan",
+      "Oldsmobile",
+      "Plymouth",
+      "Pontiac",
+      "Porsche",
+      "Saab",
+      "Scion",
+      "Subaru",
+      "Suzuki",
+      "Tesla",
+      "Toyota",
+      "Volkswagen",
+      "Volvo"
+    ],
+    "Engine Fuel Type": [
+      "diesel",
+      "electric",
+      "flex-fuel (premium unleaded recommended/E85)",
+      "flex-fuel (premium unleaded required/E85)",
+      "flex-fuel (unleaded/E85)",
+      "flex-fuel (unleaded/natural gas)",
+      "natural gas",
+      "premium unleaded (recommended)",
+      "premium unleaded (required)",
+      "regular unleaded"
+    ],
+    "Vehicle Size": [
+      "Compact",
+      "Midsize",
+      "Large"
+    ]
+  },
+  "rangos": {
+    "Engine HP": [
+      66,
+      707,
+      240
+    ],
+    "Year": [
+      1990,
+      2017,
+      2015
+    ],
+    "Popularity": [
+      21,
+      5657,
+      1385
+    ]
+  }
+}
